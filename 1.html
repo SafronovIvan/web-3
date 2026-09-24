@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>pearson</title>
+<style>
+  body { font-family: Georgia, serif; margin: 2rem; background: #fff; color: #222; }
+  @media (prefers-color-scheme: dark) { body { background: #1c1c1c; color: #eee; } }
+</style>
+</head>
+<body>
+<h4>ivangrekov1</h4>
+<p id="out"></p>
+<script>
+(function () {
+  var query = location.search.slice(1);
+  var params = {};
+  query.split('&').forEach(function (pair) {
+    var pos = pair.indexOf('=');
+    if (pos < 0) return;
+    var key = decodeURIComponent(pair.slice(0, pos));
+    var val = decodeURIComponent(pair.slice(pos + 1).replace(/\+/g, ' '));
+    params[key] = val;
+  });
+
+  function toNums(str) {
+    return (str || '').split(',')
+      .map(function (s) { return s.trim(); })
+      .filter(function (s) { return s !== ''; })
+      .map(Number);
+  }
+
+  var xs = toNums(params.A);
+  var ys = toNums(params.B);
+  var n = Math.min(xs.length, ys.length);
+  if (n < 2) { document.title = 'NaN'; return; }
+
+  var mx = 0, my = 0;
+  for (var i = 0; i < n; i++) { mx += xs[i]; my += ys[i]; }
+  mx /= n; my /= n;
+
+  var cov = 0, vx = 0, vy = 0;
+  for (var j = 0; j < n; j++) {
+    var dx = xs[j] - mx, dy = ys[j] - my;
+    cov += dx * dy; vx += dx * dx; vy += dy * dy;
+  }
+
+  var r = Math.abs(cov / Math.sqrt(vx * vy));
+  var res;
+  if (!isFinite(r)) {
+    res = 'NaN';
+  } else {
+    var t = Math.floor(r * 1000 + 1e-9);
+    res = t >= 1000 ? '1' : (t / 1000).toFixed(3);
+  }
+  document.title = res;
+  document.getElementById('out').textContent = res;
+})();
+</script>
+</body>
+</html>
